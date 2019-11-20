@@ -136,7 +136,7 @@ Returns NIL (false) otherwise."
 
 
 ;;;NOTE: This function is complete. No need to change it.
-(DEFUN ancestors (name tree1)
+(DEFUN ancestors (name tree)
   "Returns a list of names (strings or symbols) of all the ancestors of NAME in TREE. 
 Does not remove any duplicated names! Does not sort names! Does dynamic type checking
 to see whether all the arguments are of the correct types."
