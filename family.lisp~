@@ -96,6 +96,7 @@
   (parent1 NIL) ; a symbol or string or NIL
   (parent2 NIL) ; a symbol or string or NIL
   (name NIL))   ; a symbol or string or NIL
+  
 
 ;;If you want to add more slots to the person
 ;;structure (say, children or spouse), use
@@ -172,7 +173,7 @@ the hashtable in TREE with the key in NAME."
     (ERROR "STORE-PERSON called with NAME (~A) that is not a SYMBOL or a STRING." name))
   ;; NOTE1: TEAMS NEED TO WRITE THE NEXT LINE.
   ;;        Hint: a "setf" expression.
-
+  (setf (gethash name tree)struct)
 
   ;; NOTE2: Leave this last line as "name" so
   ;;        that the name argument is what is
@@ -191,7 +192,12 @@ exists as a person in the TREE!"
          (parent1 (person-parent1 p))
          (parent2 (person-parent2 p)))
     ;;body of function goes here.
-    ))
+    (when parent1
+       (append (list parent1 parent2)
+               (ancestorsb parent1 tree)
+               (ancestorsb parent2 tree)))))
+    
+
 
 
 
@@ -199,17 +205,43 @@ exists as a person in the TREE!"
 ;;NOTE: This function needs to be defined by team   
 (DEFUN handle-E (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  (LET ()
+ (IF (= 2 (LENGTH linelist))
+  (LET* ((a (FIRST linelist))
+         (b (SECOND linelist))
+         (pa (make-person :name a :parent1 nil :parent2 nil))
+         (pb (make-person :name b :parent1 nil :parent2 nil)))  
+    (IF (not (person-exists a tree))
+        ;;(LET ((pa (make-person :name a :parent1 nil :parent2 nil)))
+          (add-person a pa tree))
+    (IF (not (person-exists b tree))
+        (add-person b pb tree))))
+   ;;else goes here
+    
+   (LET* ((a (FIRST linelist))
+          (b (SECOND linelist))
+          (c (THIRD linelist))
+          (pa (make-person :name a :parent1 nil :parent2 nil))
+          (pb (make-person :name b :parent1 nil :parent2 nil))
+          (pc (make-person :name c :parent1 a :parent2 b)))  
+     (IF (not (person-exists a tree))
+         (add-person a pa tree))
+     (IF (not (person-exists b tree))
+         (add-person b pb tree))
+     (IF (not (person-exists c tree))
+         (add-person c pc tree)
+   )))
+  
   ;;body of function goes here
-
-  ))
+  
+  
 
 
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-X (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  (LET ()
+  (LET (  )
     ;;body of function goes here
+
 
     ))
 
@@ -237,15 +269,15 @@ exists as a person in the TREE!"
 each line from the file opened in STREAM."
   (LET ((tree (MAKE-HASH-TABLE :size 1000 :test #'equal))
         (line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-  (LOOP
-    (CASE (FIRST line-items)
-      ("E" (handle-E (REST line-items) tree))
-      ("W" (handle-W (REST line-items) tree))
-      ("X" (handle-X (REST line-items) tree))
-      (t (RETURN nil))) ; end of file reached
-    (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-  )
-)
+    (LOOP
+     (CASE (FIRST line-items)
+       ("E" (handle-E (REST line-items) tree))
+       ("W" (handle-W (REST line-items) tree))
+       ("X" (handle-X (REST line-items) tree))
+       (t (RETURN nil))) ; end of file reached
+     (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
+    (ancestors "Annie" tree)
+))
 
 
 ;;How Dr. Klassner and Jenish will test your code in the Listener:
