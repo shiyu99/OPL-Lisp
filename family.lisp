@@ -95,8 +95,10 @@
             (:print-function print-person))
   (parent1 NIL) ; a symbol or string or NIL
   (parent2 NIL) ; a symbol or string or NIL
-  (name NIL))   ; a symbol or string or NIL
-  
+  (name NIL)
+  (children(list))
+)   ; a symbol or string or NIL
+
 
 ;;If you want to add more slots to the person
 ;;structure (say, children or spouse), use
@@ -146,7 +148,7 @@ to see whether all the arguments are of the correct types."
   (WHEN (NOT (HASH-TABLE-P tree))
     (ERROR "ANCESTORS called with TREE (~A) that is not a HASH-TABLE." tree))
   (WHEN (person-exists name tree)
-    (sort(ancestorsb name tree))))
+    (remove-duplicates(sort(ancestorsb name tree)))))
 
 
 
@@ -181,6 +183,18 @@ the hashtable in TREE with the key in NAME."
   name)
 
 
+(DEFUN getChildren (n1 FamilyTree)
+  "Get the children of n1"
+  (setq children (list))
+  (if (gethash n1 FamilyTree);Check if person exists
+      (progn
+        (loop for x being the hash-key of FamilyTree ;Look at parents of all the people in tree
+              do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
+                    (push x children))))) ;add the current x to the list of children
+  (remove-duplicates(sort children #'string<=))) ;Sort the list and return
+
+
+
 
 ;;This function needs to be defined by your team.
 (DEFUN ancestorsb (name tree)
@@ -196,7 +210,52 @@ exists as a person in the TREE!"
        (append (list parent1 parent2)
                (ancestorsb parent1 tree)
                (ancestorsb parent2 tree)))))
+
+;;(DEFUN getChildren(p1 tree)
+  ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
+  ;;(remove-duplicates(sort p1-children #'string<=)))
+
+(DEFUN getSibs(p1 tree)
+  (LET ()
+
+))
+
+(DEFUN getUnrelated(p1 tree)
+  (LET ()
+
+))
+
+(DEFUN getCousinX(p1 x tree)
+  (LET ()
+
+))
     
+
+(DEFUN isChild (p1 p2 tree)
+  (LET ()
+
+))
+
+(DEFUN isSib(p1 p2 tree)
+  (LET ()
+
+))
+
+(DEFUN isAncestor (p1 p2 tree)
+  (LET ()
+
+))
+
+(DEFUN isCousinX (p1 x p2 tree)
+  (LET ()
+
+))
+
+(DEFUN isUnrelated(p1 p2 tree)
+  (LET ()
+
+))
+
 
 
 
@@ -208,13 +267,13 @@ exists as a person in the TREE!"
  (IF (= 2 (LENGTH linelist))
   (LET* ((a (FIRST linelist))
          (b (SECOND linelist))
-         (pa (make-person :name a :parent1 nil :parent2 nil))
-         (pb (make-person :name b :parent1 nil :parent2 nil)))  
+         (pa (make-person :name a :parent1 nil :parent2 nil :children nil))
+         (pb (make-person :name b :parent1 nil :parent2 nil :children nil)))  
     (IF (not (person-exists a tree))
         ;;(LET ((pa (make-person :name a :parent1 nil :parent2 nil)))
           (add-person a pa tree))
     (IF (not (person-exists b tree))
-        (add-person b pb tree))))
+        (add-person b pb tree)))
    ;;else goes here
     
    (LET* ((a (FIRST linelist))
@@ -229,7 +288,7 @@ exists as a person in the TREE!"
          (add-person b pb tree))
      (IF (not (person-exists c tree))
          (add-person c pc tree)
-   )))
+   ))))
   
   ;;body of function goes here
   
@@ -239,20 +298,52 @@ exists as a person in the TREE!"
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-X (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  (LET (  )
-    ;;body of function goes here
+  
+  (IF(= 3 (LENGTH linelist))
+     (LET* ((a (FIRST linelist))
+         (b (THIRD linelist)))
+       (COND ((not (person-exists a tree))
+              (FORMAT t "~A doesn't exist in the family" a))
+             ((not (person-exists b tree))
+              (FORMAT t "~A doesn't exist in the family" b))
+             ((and (person-exists a tree) (person-exists b tree))
+              (CASE (SECOND linelist)
+                ("ancestor" (isAncestor a b tree))
+                ("sibling" (isSib a b tree))
+                ("child" (isChild a b tree))
+                ("unrelated"(isUnrelated a b tree))))))
 
-
-    ))
-
+    ;;else
+    (LET* ((a (FIRST linelist))
+           (b (FOURTH linelist)))
+      (cond ((not (person-exists a tree))
+             (FORMAT t "~A doesn't exist in the family" a))
+            ((not (person-exists b tree))
+             (FORMAT t "~A doesn't exist in the family" b))
+            ((and (person-exists a tree) (person-exists b tree))
+             (isCousinX a (THIRD linelist) b tree))))))
 
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-W (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  (LET ()
     ;;body of function goes here
+(IF(= 2 (LENGTH linelist))
+     (LET* ((a (SECOND linelist)))
+       (IF (NOT (person-exists a tree))
+           (FORMAT t "~A doesn't exist in the family" a)
+         
+         (CASE (FIRST linelist)
+           ("ancestor" (ancestors a tree))
+           ("sibling" (getSibs a tree))
+           ("child" (loop for i in (getChildren a tree) doing (format t "~a~%" i)))
+           ("unrelated"(getUnrelated a tree)))))
 
-    ))
+    ;;else
+    (LET* ((a (THIRD linelist)))
+      (IF (not (person-exists a tree))
+          (FORMAT t "~A doesn't exist in the family" a)
+        (getCousinX a (SECOND linelist) tree)))))
+ 
 
 ;;;------------------------------------------------
 ;;; TEAM SHOULD PUT ALL NEW HELPER FUNCTION
@@ -306,4 +397,4 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    (ancestors "Alex" tree)))
+    (getChildren "Zebulon" tree)))
