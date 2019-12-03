@@ -241,8 +241,8 @@ exists as a person in the TREE!"
 
 ))
 
-(DEFUN isAncestor (p1 p2 tree)
- (member p1 (ancestors p2 tree):test #'EQUAL) 
+(DEFUN isAncestor (n1 n2 tree)
+  (member n1 (ancestors n2 tree):test #'EQUAL)
 
 )
 
@@ -304,7 +304,7 @@ exists as a person in the TREE!"
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-X (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  
+  (FORMAT t "X ~a ancestor ~a~%" (FIRST linelist)(THIRD linelist))
   (IF(= 3 (LENGTH linelist))
      (LET* ((a (FIRST linelist))
          (b (THIRD linelist)))
@@ -317,8 +317,8 @@ exists as a person in the TREE!"
                     (pb (lookup-person b tree)))              
               (COND 
                ((EQUAL "ancestor"(SECOND linelist))
-                 (IF(isAncestor pa pb tree) (FORMAT t "YES")
-                   (FORMAT t "NO")))
+                 (IF(isAncestor a b tree) (FORMAT t "YES~%")
+                   (FORMAT t "NO~%")))
                 ((EQUAL "sibling"(SECOND linelist)) (isSib a b tree))
                 ((EQUAL "child"(SECOND linelist))(isChild a b tree))
                 ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree)))))))
