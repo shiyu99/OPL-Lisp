@@ -96,7 +96,8 @@
   (parent1 NIL) ; a symbol or string or NIL
   (parent2 NIL) ; a symbol or string or NIL
   (name NIL)
-  (children(list)))   ; a symbol or string or NIL
+  (children(list))
+)   ; a symbol or string or NIL
 
 
 ;;If you want to add more slots to the person
@@ -210,9 +211,9 @@ exists as a person in the TREE!"
                (ancestorsb parent1 tree)
                (ancestorsb parent2 tree)))))
 
-(DEFUN getChildren(p1 tree)
-  ;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
-  (remove-duplicates(sort p1-children #'string<=)))
+;;(DEFUN getChildren(p1 tree)
+  ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
+  ;;(remove-duplicates(sort p1-children #'string<=)))
 
 (DEFUN getSibs(p1 tree)
   (LET ()
@@ -396,4 +397,4 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    (ancestors "Alex" tree)))
+    (getChildren "Zebulon" tree)))
