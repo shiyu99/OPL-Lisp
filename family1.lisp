@@ -304,42 +304,49 @@ exists as a person in the TREE!"
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-X (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  (FORMAT t "X ~a ancestor ~a~%" (FIRST linelist)(THIRD linelist))
+  ;(FORMAT t "X ~a ancestor ~a~%" (FIRST linelist)(THIRD linelist))
   (IF(= 3 (LENGTH linelist))
-     (LET* ((a (FIRST linelist))
-         (b (THIRD linelist)))
-       (COND ((not (person-exists a tree))
-              (FORMAT t "~A doesn't exist in the family" a))
-             ((not (person-exists b tree))
-              (FORMAT t "~A doesn't exist in the family" b))
-             ((and (person-exists a tree) (person-exists b tree))
-              (let* ((pa (lookup-person a tree))
-                    (pb (lookup-person b tree)))              
-              (COND 
-               ((EQUAL "ancestor"(SECOND linelist))
-                 (IF(isAncestor a b tree) (FORMAT t "YES~%")
-                   (FORMAT t "NO~%")))
-                ((EQUAL "sibling"(SECOND linelist)) (isSib a b tree))
-                ((EQUAL "child"(SECOND linelist))(isChild a b tree))
-                ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree)))))))
+      (PROGN
+        (FORMAT t "X ~a ~a ~a~%" (FIRST linelist)(SECOND linelist)(THIRD linelist))
+         (LET* ((a (FIRST linelist))
+                (b (THIRD linelist)))
+           (COND ((not (person-exists a tree))
+                  (FORMAT t "~A doesn't exist in the family" a))
+                 ((not (person-exists b tree))
+                  (FORMAT t "~A doesn't exist in the family" b))
+                 ((and (person-exists a tree) (person-exists b tree))
+                  (let* ((pa (lookup-person a tree))
+                         (pb (lookup-person b tree)))              
+                    (COND 
+                     ((EQUAL "ancestor"(SECOND linelist))
+                      (IF(isAncestor a b tree) (FORMAT t "YES~%")
+                        (FORMAT t "NO~%")))
+                     ((EQUAL "sibling"(SECOND linelist)) (isSib a b tree))
+                     ((EQUAL "child"(SECOND linelist))(isChild a b tree))
+                     ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree))))))))
 
     ;;else
-    (LET* ((a (FIRST linelist))
-           (b (FOURTH linelist)))
-      (cond ((not (person-exists a tree))
-             (FORMAT t "~A doesn't exist in the family" a))
-            ((not (person-exists b tree))
-             (FORMAT t "~A doesn't exist in the family" b))
-            ((and (person-exists a tree) (person-exists b tree))
-             (isCousinX a (THIRD linelist) b tree))))))
+    (PROGN
+      (FORMAT t "X ~a cousin ~a  ~a~%" (FIRST linelist)(THIRD linelist)(FOURTH linelist))
+      (LET* ((a (FIRST linelist))
+             (b (FOURTH linelist))
+           (cond ((not (person-exists a tree)))
+                  ;(FORMAT t "~A doesn't exist in the family" a)
+                  
+                 ((not (person-exists b tree)))
+                  ;(FORMAT t "~A doesn't exist in the family" b)
+                  
+                 ((and (person-exists a tree) (person-exists b tree))
+                  (isCousinX a (THIRD linelist) b tree))))))))
 
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-W (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
     ;;body of function goes here
-    (FORMAT t "W ancestor ~a " (SECOND linelist))
+    ;(FORMAT t "W ancestor ~a " (SECOND linelist))
 (IF(= 2 (LENGTH linelist))
-     (LET* ((a (SECOND linelist)))
+     (LET* ((a (SECOND linelist))
+           ;(FORMAT t "W ~a ~a " (FIRST linelist)(SECOND linelist)))
        (IF (NOT (person-exists a tree))
            (FORMAT t "~A doesn't exist in the family" a)
          
@@ -350,7 +357,8 @@ exists as a person in the TREE!"
            ((EQUAL "unrelated"(FIRST linelist))(getUnrelated a tree)))))
 
     ;;else
-    (LET* ((a (THIRD linelist)))
+    (LET* ((a (THIRD linelist))
+           ;(FORMAT t "W ~a cousin ~a ~a " (FIRST linelist)(THIRD linelist)(FOURTH linelist)))
       (IF (not (person-exists a tree))
           (FORMAT t "~A doesn't exist in the family" a)
         (getCousinX a (SECOND linelist) tree)))))
