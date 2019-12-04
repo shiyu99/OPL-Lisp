@@ -192,7 +192,9 @@ the hashtable in TREE with the key in NAME."
      ;         do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
       ;              (push x children))))) ;add the current x to the list of children
   ;(remove-duplicates(sort children #'string<=))) ;Sort the list and return
-
+(DEFUN getChildren (n1 FamilyTree)
+     (person-children (lookup-person n1 FamilyTree)) 
+)
 
 ;;This function needs to be defined by your team.
 (DEFUN ancestorsb (name tree)
@@ -213,9 +215,8 @@ exists as a person in the TREE!"
   ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
   ;;(remove-duplicates(sort p1-children #'string<=)))
 
-(DEFUN getSibs(p1 tree)
-  (LET()
-))
+
+
 
 (DEFUN getUnrelated(p1 tree)
   (LET ()
@@ -405,4 +406,6 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    (ancestors "Alex" tree)))
+    (ancestors "Alex" tree)
+    (getChildren "Zebulon" tree)
+   ))
