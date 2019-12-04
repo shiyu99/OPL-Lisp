@@ -194,8 +194,6 @@ the hashtable in TREE with the key in NAME."
   (remove-duplicates(sort children #'string<=))) ;Sort the list and return
 
 
-
-
 ;;This function needs to be defined by your team.
 (DEFUN ancestorsb (name tree)
   "A helper function for the ANCESTORS function. 
@@ -216,8 +214,7 @@ exists as a person in the TREE!"
   ;;(remove-duplicates(sort p1-children #'string<=)))
 
 (DEFUN getSibs(p1 tree)
-  (LET ()
-
+  (LET()
 ))
 
 (DEFUN getUnrelated(p1 tree)
@@ -397,4 +394,5 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    (getChildren "Zebulon" tree)))
+   
+))

@@ -96,7 +96,8 @@
   (parent1 NIL) ; a symbol or string or NIL
   (parent2 NIL) ; a symbol or string or NIL
   (name NIL)
-  (children(list)))   ; a symbol or string or NIL
+  (children(list))
+)   ; a symbol or string or NIL
 
 
 ;;If you want to add more slots to the person
@@ -193,7 +194,18 @@ the hashtable in TREE with the key in NAME."
   (remove-duplicates(sort children #'string<=))) ;Sort the list and return
 
 
-
+(DEFUN getAncestors(n1 FamilyTree)
+  "get the ancestors of n1"
+  (setq ancestors (list))
+  (if (gethash n1 FamilyTree);Check if person exists
+ (progn
+        (loop for x being the hash-values of FamilyTree ;Look at parents of all the people in tree
+              do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
+                    (print x)
+              )
+        )))
+ ;add the current x to the list of children
+  (remove-duplicates(sort children #'string<=)))
 
 ;;This function needs to be defined by your team.
 (DEFUN ancestorsb (name tree)
@@ -210,9 +222,9 @@ exists as a person in the TREE!"
                (ancestorsb parent1 tree)
                (ancestorsb parent2 tree)))))
 
-(DEFUN getChildren(p1 tree)
-  ;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
-  (remove-duplicates(sort p1-children #'string<=)))
+;;(DEFUN getChildren(p1 tree)
+  ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
+  ;;(remove-duplicates(sort p1-children #'string<=)))
 
 (DEFUN getSibs(p1 tree)
   (LET ()
@@ -396,4 +408,6 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    (ancestors "Alex" tree)))
+    ;;(getChildren "Zebulon" tree)
+    (getAncestors "Fred" tree)
+))
