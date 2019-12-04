@@ -96,7 +96,7 @@
   (parent1 NIL) ; a symbol or string or NIL
   (parent2 NIL) ; a symbol or string or NIL
   (name NIL)
-  (children(list))
+  (children nil)
 )   ; a symbol or string or NIL
 
 
@@ -148,7 +148,7 @@ to see whether all the arguments are of the correct types."
   (WHEN (NOT (HASH-TABLE-P tree))
     (ERROR "ANCESTORS called with TREE (~A) that is not a HASH-TABLE." tree))
   (WHEN (person-exists name tree)
-    (remove-duplicates(sort(ancestorsb name tree)))))
+    (remove-duplicates (sort (ancestorsb name tree) #'string<=) :test #'equal)))
 
 
 
@@ -183,15 +183,15 @@ the hashtable in TREE with the key in NAME."
   name)
 
 
-(DEFUN getChildren (n1 FamilyTree)
+;(DEFUN getChildren (n1 FamilyTree)
   "Get the children of n1"
-  (setq children (list))
-  (if (gethash n1 FamilyTree);Check if person exists
-      (progn
-        (loop for x being the hash-key of FamilyTree ;Look at parents of all the people in tree
-              do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
-                    (push x children))))) ;add the current x to the list of children
-  (remove-duplicates(sort children #'string<=))) ;Sort the list and return
+ ; (setq children (list))
+  ;(if (gethash n1 FamilyTree);Check if person exists
+   ;   (progn
+    ;    (loop for x being the hash-key of FamilyTree ;Look at parents of all the people in tree
+     ;         do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
+      ;              (push x children))))) ;add the current x to the list of children
+  ;(remove-duplicates(sort children #'string<=))) ;Sort the list and return
 
 
 ;;This function needs to be defined by your team.
@@ -238,10 +238,10 @@ exists as a person in the TREE!"
 
 ))
 
-(DEFUN isAncestor (p1 p2 tree)
-  (LET ()
+(DEFUN isAncestor (n1 n2 tree)
+  (member n1 (ancestors n2 tree):test #'EQUAL)
 
-))
+)
 
 (DEFUN isCousinX (p1 x p2 tree)
   (LET ()
@@ -268,7 +268,7 @@ exists as a person in the TREE!"
          (pb (make-person :name b :parent1 nil :parent2 nil :children nil)))  
     (IF (not (person-exists a tree))
         ;;(LET ((pa (make-person :name a :parent1 nil :parent2 nil)))
-          (add-person a pa tree))
+        (add-person a pa tree))
     (IF (not (person-exists b tree))
         (add-person b pb tree)))
    ;;else goes here
@@ -279,13 +279,19 @@ exists as a person in the TREE!"
           (pa (make-person :name a :parent1 nil :parent2 nil))
           (pb (make-person :name b :parent1 nil :parent2 nil))
           (pc (make-person :name c :parent1 a :parent2 b)))  
+     
      (IF (not (person-exists a tree))
-         (add-person a pa tree))
+         (add-person a pa tree)
+       (let* ((pa (lookup-person a tree)))
+         (setf (person-children pa) (append (person-children pa) (list c)))))  
      (IF (not (person-exists b tree))
-         (add-person b pb tree))
+         (add-person b pb tree)
+       (let* ((pb (lookup-person b tree)))
+         (setf (person-children pb) (append (person-children pb) (list c)))))     
      (IF (not (person-exists c tree))
          (add-person c pc tree)
-   ))))
+       (let* ((pc (lookup-person c tree)))
+         (setf (person-parent1 a) (person-parent2 b)))))))
   
   ;;body of function goes here
   
@@ -295,7 +301,7 @@ exists as a person in the TREE!"
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-X (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  
+  (FORMAT t "X ~a ancestor ~a~%" (FIRST linelist)(THIRD linelist))
   (IF(= 3 (LENGTH linelist))
      (LET* ((a (FIRST linelist))
          (b (THIRD linelist)))
@@ -304,11 +310,15 @@ exists as a person in the TREE!"
              ((not (person-exists b tree))
               (FORMAT t "~A doesn't exist in the family" b))
              ((and (person-exists a tree) (person-exists b tree))
-              (CASE (SECOND linelist)
-                ("ancestor" (isAncestor a b tree))
-                ("sibling" (isSib a b tree))
-                ("child" (isChild a b tree))
-                ("unrelated"(isUnrelated a b tree))))))
+              (let* ((pa (lookup-person a tree))
+                    (pb (lookup-person b tree)))              
+              (COND 
+               ((EQUAL "ancestor"(SECOND linelist))
+                 (IF(isAncestor a b tree) (FORMAT t "YES~%")
+                   (FORMAT t "NO~%")))
+                ((EQUAL "sibling"(SECOND linelist)) (isSib a b tree))
+                ((EQUAL "child"(SECOND linelist))(isChild a b tree))
+                ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree)))))))
 
     ;;else
     (LET* ((a (FIRST linelist))
@@ -324,16 +334,17 @@ exists as a person in the TREE!"
 (DEFUN handle-W (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
     ;;body of function goes here
+    (FORMAT t "W ancestor ~a " (SECOND linelist))
 (IF(= 2 (LENGTH linelist))
      (LET* ((a (SECOND linelist)))
        (IF (NOT (person-exists a tree))
            (FORMAT t "~A doesn't exist in the family" a)
          
-         (CASE (FIRST linelist)
-           ("ancestor" (ancestors a tree))
-           ("sibling" (getSibs a tree))
-           ("child" (loop for i in (getChildren a tree) doing (format t "~a~%" i)))
-           ("unrelated"(getUnrelated a tree)))))
+         (COND 
+           ((EQUAL "ancestor"(FIRST linelist)) (loop for i in (ancestors a tree) doing (FORMAT t "~A~%" i)))
+           ((EQUAL "sibling"(FIRST linelist))(getSibs a tree))
+           ((EQUAL "child"(FIRST linelist))(loop for i in (getChildren a tree) doing (format t "~a~%" i)))
+           ((EQUAL "unrelated"(FIRST linelist))(getUnrelated a tree)))))
 
     ;;else
     (LET* ((a (THIRD linelist)))
@@ -358,10 +369,10 @@ each line from the file opened in STREAM."
   (LET ((tree (MAKE-HASH-TABLE :size 1000 :test #'equal))
         (line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
     (LOOP
-     (CASE (FIRST line-items)
-       ("E" (handle-E (REST line-items) tree))
-       ("W" (handle-W (REST line-items) tree))
-       ("X" (handle-X (REST line-items) tree))
+     (COND
+       ((EQUAL "E" (FIRST line-items)) (handle-E (REST line-items) tree))
+       ((EQUAL "W" (FIRST line-items)) (handle-W (REST line-items) tree))
+       ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
     (ancestors "Annie" tree)
@@ -394,5 +405,4 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-   
-))
+    (ancestors "Alex" tree)))

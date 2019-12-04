@@ -408,6 +408,4 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    ;;(getChildren "Zebulon" tree)
-    (getAncestors "Fred" tree)
-))
+    (getChildren "Zebulon" tree)))
