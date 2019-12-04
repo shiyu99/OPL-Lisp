@@ -192,9 +192,9 @@ the hashtable in TREE with the key in NAME."
      ;         do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
       ;              (push x children))))) ;add the current x to the list of children
   ;(remove-duplicates(sort children #'string<=))) ;Sort the list and return
-
-
-
+(DEFUN getChildren (n1 FamilyTree)
+     (person-children (lookup-person n1 FamilyTree)) 
+)
 
 ;;This function needs to be defined by your team.
 (DEFUN ancestorsb (name tree)
@@ -215,10 +215,8 @@ exists as a person in the TREE!"
   ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
   ;;(remove-duplicates(sort p1-children #'string<=)))
 
-(DEFUN getSibs(p1 tree)
-  (LET ()
 
-))
+
 
 (DEFUN getUnrelated(p1 tree)
   (LET ()
@@ -304,10 +302,10 @@ exists as a person in the TREE!"
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-X (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
-  ;(FORMAT t "X ~a ancestor ~a~%" (FIRST linelist)(THIRD linelist))
+  (FORMAT T "X ~{~a ~} ~%" linelist)
   (IF(= 3 (LENGTH linelist))
-      (PROGN
-        (FORMAT t "X ~a ~a ~a~%" (FIRST linelist)(SECOND linelist)(THIRD linelist))
+      
+        ;(FORMAT t "X ~a ~a ~a~%" (FIRST linelist)(SECOND linelist)(THIRD linelist))
          (LET* ((a (FIRST linelist))
                 (b (THIRD linelist)))
            (COND ((not (person-exists a tree))
@@ -323,29 +321,28 @@ exists as a person in the TREE!"
                         (FORMAT t "NO~%")))
                      ((EQUAL "sibling"(SECOND linelist)) (isSib a b tree))
                      ((EQUAL "child"(SECOND linelist))(isChild a b tree))
-                     ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree))))))))
+                     ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree)))))))
 
     ;;else
-    (PROGN
-      (FORMAT t "X ~a cousin ~a  ~a~%" (FIRST linelist)(THIRD linelist)(FOURTH linelist))
+  
       (LET* ((a (FIRST linelist))
-             (b (FOURTH linelist))
-           (cond ((not (person-exists a tree)))
-                  ;(FORMAT t "~A doesn't exist in the family" a)
+             (b (FOURTH linelist)))
+           (cond ((not (person-exists a tree))
+                  (FORMAT t "~A doesn't exist in the family" a))
                   
-                 ((not (person-exists b tree)))
-                  ;(FORMAT t "~A doesn't exist in the family" b)
+                 ((not (person-exists b tree))
+                  (FORMAT t "~A doesn't exist in the family" b))
                   
                  ((and (person-exists a tree) (person-exists b tree))
-                  (isCousinX a (THIRD linelist) b tree))))))))
+                  (isCousinX a (THIRD linelist) b tree))))))
 
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-W (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
     ;;body of function goes here
-    ;(FORMAT t "W ancestor ~a " (SECOND linelist))
+    (FORMAT t "W ~{~a~} ~% " linelist)
 (IF(= 2 (LENGTH linelist))
-     (LET* ((a (SECOND linelist))
+     (LET* ((a (SECOND linelist)))
            ;(FORMAT t "W ~a ~a " (FIRST linelist)(SECOND linelist)))
        (IF (NOT (person-exists a tree))
            (FORMAT t "~A doesn't exist in the family" a)
@@ -357,7 +354,7 @@ exists as a person in the TREE!"
            ((EQUAL "unrelated"(FIRST linelist))(getUnrelated a tree)))))
 
     ;;else
-    (LET* ((a (THIRD linelist))
+    (LET* ((a (THIRD linelist)))
            ;(FORMAT t "W ~a cousin ~a ~a " (FIRST linelist)(THIRD linelist)(FOURTH linelist)))
       (IF (not (person-exists a tree))
           (FORMAT t "~A doesn't exist in the family" a)
@@ -416,4 +413,6 @@ each line from the file opened in STREAM."
     ;; this last call should make test-tree return a list containing the following
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
-    (ancestors "Alex" tree)))
+    (ancestors "Alex" tree)
+    (getChildren "Zebulon" tree)
+   ))
