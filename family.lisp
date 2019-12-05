@@ -96,7 +96,7 @@
   (parent1 NIL) ; a symbol or string or NIL
   (parent2 NIL) ; a symbol or string or NIL
   (name NIL)
-  (children nil)
+  (children nil); a list or nil
 )   ; a symbol or string or NIL
 
 
@@ -183,17 +183,8 @@ the hashtable in TREE with the key in NAME."
   name)
 
 
-;(DEFUN getChildren (n1 FamilyTree)
-  "Get the children of n1"
- ; (setq children (list))
-  ;(if (gethash n1 FamilyTree);Check if person exists
-   ;   (progn
-    ;    (loop for x being the hash-key of FamilyTree ;Look at parents of all the people in tree
-     ;         do(if(find n1 (gethash x FamilyTree)) ;if name of the n1 is found in list of parents, then x is a child so...
-      ;              (push x children))))) ;add the current x to the list of children
-  ;(remove-duplicates(sort children #'string<=))) ;Sort the list and return
 (DEFUN getChildren (n1 FamilyTree)
-     (person-children (lookup-person n1 FamilyTree)) 
+     (remove-duplicates (sort(person-children (lookup-person n1 FamilyTree))#'string<=) :test #'equal) 
 )
 
 ;;This function needs to be defined by your team.
@@ -229,10 +220,9 @@ exists as a person in the TREE!"
 ))
     
 
-(DEFUN isChild (p1 p2 tree)
-  (LET ()
-
-))
+(DEFUN isChild (n1 n2 tree)
+  (member n1 (getChildren n2 tree):test #'EQUAL)
+)
 
 (DEFUN isSib(p1 p2 tree)
   (LET ()
@@ -241,7 +231,6 @@ exists as a person in the TREE!"
 
 (DEFUN isAncestor (n1 n2 tree)
   (member n1 (ancestors n2 tree):test #'EQUAL)
-
 )
 
 (DEFUN isCousinX (p1 x p2 tree)
@@ -277,13 +266,15 @@ exists as a person in the TREE!"
    (LET* ((a (FIRST linelist))
           (b (SECOND linelist))
           (c (THIRD linelist))
-          (pa (make-person :name a :parent1 nil :parent2 nil))
+          
           (pb (make-person :name b :parent1 nil :parent2 nil))
           (pc (make-person :name c :parent1 a :parent2 b)))  
      
      (IF (not (person-exists a tree))
-         (add-person a pa tree)
-       (let* ((pa (lookup-person a tree)))
+         (let ((pa (make-person :name a :parent1 nil :parent2 nil)))
+           (add-person a pa tree)
+           (setf (person-children pa) (append (person-children pa) (list c))))
+       (let((pa (lookup-person a tree)))
          (setf (person-children pa) (append (person-children pa) (list c)))))  
      (IF (not (person-exists b tree))
          (add-person b pb tree)
@@ -317,11 +308,17 @@ exists as a person in the TREE!"
                          (pb (lookup-person b tree)))              
                     (COND 
                      ((EQUAL "ancestor"(SECOND linelist))
-                      (IF(isAncestor a b tree) (FORMAT t "YES~%")
+                      (IF (isAncestor a b tree) (FORMAT t "YES~%")
                         (FORMAT t "NO~%")))
-                     ((EQUAL "sibling"(SECOND linelist)) (isSib a b tree))
-                     ((EQUAL "child"(SECOND linelist))(isChild a b tree))
-                     ((EQUAL "unrelated"(SECOND linelist))(isUnrelated a b tree)))))))
+                     ((EQUAL "sibling"(SECOND linelist)) 
+                      (IF (isSib a b tree) (FORMAT t "YES~%")
+                       (FORMAT t "NO~%")))
+                     ((EQUAL "child"(SECOND linelist))
+                      (IF (isChild a b tree) (FORMAT t "YES~%")
+                        (FORMAT t "NO~%")))
+                     ((EQUAL "unrelated"(SECOND linelist))
+                      (IF (isUnrelated a b tree) (FORMAT t "YES~%") 
+                        (FORMAT t "NO~%"))))))))
 
     ;;else
   
@@ -334,7 +331,8 @@ exists as a person in the TREE!"
                   (FORMAT t "~A doesn't exist in the family" b))
                   
                  ((and (person-exists a tree) (person-exists b tree))
-                  (isCousinX a (THIRD linelist) b tree))))))
+                  (IF (isCousinX a (THIRD linelist) b tree) (FORMAT t "YES~%")
+                    (FORMAT t "NO~%")))))))
 
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-W (linelist tree)
