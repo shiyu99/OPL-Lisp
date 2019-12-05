@@ -326,7 +326,7 @@ exists as a person in the TREE!"
     ;;else
   
       (LET* ((a (FIRST linelist))
-             (b (FOURTH linelist))
+             (b (FOURTH linelist)))
            (cond ((not (person-exists a tree))
                   (FORMAT t "~A doesn't exist in the family" a))
                   
@@ -334,7 +334,7 @@ exists as a person in the TREE!"
                   (FORMAT t "~A doesn't exist in the family" b))
                   
                  ((and (person-exists a tree) (person-exists b tree))
-                  (isCousinX a (THIRD linelist) b tree)))))))
+                  (isCousinX a (THIRD linelist) b tree))))))
 
 ;;NOTE: This function needs to be defined by team
 (DEFUN handle-W (linelist tree)
@@ -342,7 +342,7 @@ exists as a person in the TREE!"
     ;;body of function goes here
     (FORMAT t "W ~{~a~} ~% " linelist)
 (IF(= 2 (LENGTH linelist))
-     (LET* ((a (SECOND linelist))
+     (LET* ((a (SECOND linelist)))
            ;(FORMAT t "W ~a ~a " (FIRST linelist)(SECOND linelist)))
        (IF (NOT (person-exists a tree))
            (FORMAT t "~A doesn't exist in the family" a)
@@ -354,11 +354,11 @@ exists as a person in the TREE!"
            ((EQUAL "unrelated"(FIRST linelist))(getUnrelated a tree)))))
 
     ;;else
-    (LET* ((a (THIRD linelist))
+    (LET* ((a (THIRD linelist)))
            ;(FORMAT t "W ~a cousin ~a ~a " (FIRST linelist)(THIRD linelist)(FOURTH linelist)))
       (IF (not (person-exists a tree))
           (FORMAT t "~A doesn't exist in the family" a)
-        (getCousinX a (SECOND linelist) tree)))))))
+        (getCousinX a (SECOND linelist) tree)))))
  
 
 ;;;------------------------------------------------
