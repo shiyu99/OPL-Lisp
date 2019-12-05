@@ -206,6 +206,24 @@ exists as a person in the TREE!"
   ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
   ;;(remove-duplicates(sort p1-children #'string<=)))
 
+(DEFUN getSibs(p1 tree)
+  (setq siblings (list))
+  (LET* ((p (lookup-person name tree))
+         (parent1 (person-parent1 p))
+         (parent2 (person-parent2 p))
+         (childrenParent1 (getChildren parent1 tree))
+         (childrenParent2 (getChildren parent2 tree))
+         )
+       (loop for x in childrenParent1
+             do (if(and (member(x siblings)) (eq x p))
+                    (push x siblings)))
+       (loop for x in childrenParent2
+             do (if(and (member(x siblings)) (eq x p))
+                    (push x siblings)))
+
+    )
+  siblings
+)
 
 
 
