@@ -204,7 +204,6 @@ exists as a person in the TREE!"
 
 ;get the generation level difference between an ancestor(a) and a descendent(d)
 (DEFUN getGenGap (na nd genGap tree)
-  ;(setf genGap 0)
   (LET* ((pd (lookup-person nd tree))
          (pa (lookup-person na tree))
          (parent1 (person-parent1 pd))
@@ -212,8 +211,8 @@ exists as a person in the TREE!"
     (WHEN parent1
       (IF (or (equal pa parent1) (equal pa parent2))
           (+ genGap 1))
-      (getGenGap na parent1 (+ genGap 1) tree)
-      (getGenGap na parent2 (+ genGap 1) tree)))
+      (+ genGap (getGenGap na parent1 (+ genGap 1) tree))
+     (+ genGap  (getGenGap na parent2 (+ genGap 1) tree))))
   genGap)
         
     
