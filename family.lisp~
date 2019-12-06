@@ -206,33 +206,28 @@ exists as a person in the TREE!"
   ;;;;(loop for i in (p1-children p) doing (format t "~a~%" i)))
   ;;(remove-duplicates(sort p1-children #'string<=)))
 
-(DEFUN getSibs(p1 tree)
+(DEFUN getSibs(n1 tree)
   (setq siblings (list))
-  (LET* ((p (lookup-person name tree))
+  (LET* ((p (lookup-person n1 tree))
          (parent1 (person-parent1 p))
          (parent2 (person-parent2 p))
          (childrenParent1 (getChildren parent1 tree))
          (childrenParent2 (getChildren parent2 tree))
          )
        (loop for x in childrenParent1
-             do (if(and (member(x siblings)) (eq x p))
+             do (if(and (not (member x siblings)) (not(equal x n1)))
                     (push x siblings)))
        (loop for x in childrenParent2
-             do (if(and (member(x siblings)) (eq x p))
+             do (if(and (not (member x siblings)) (not(equal x n1)))
                     (push x siblings)))
 
     )
-  siblings
+  (sort siblings #'string<=)
 )
 
 
 
 (DEFUN getUnrelated(p1 tree)
-  (LET ()
-
-))
-
-(DEFUN getCousinX(p1 x tree)
   (LET ()
 
 ))
@@ -243,15 +238,29 @@ exists as a person in the TREE!"
 )
 
 (DEFUN isSib(p1 p2 tree)
-  (LET ()
-
-))
+  (member n1 (getSibs n2 tree):test #'EQUAL)
+)
 
 (DEFUN isAncestor (n1 n2 tree)
   (member n1 (ancestors n2 tree):test #'EQUAL)
 )
+;; this needs degree
+(defun iscousin(person1 person2 tree)
+  (let ((direct nil) (cousin nil))
+  (when (and person1 person2)
+      (if (string= (person-name person1) (person-name person2)) (setf direct t))
+      (if (or (isChild person1 person2) (isChild person2 person1)) (setf direct t))
+      (let ((ancestors1 (getancestors person1 tree)) (ancestors2 (getancestors person2 tree)))
+      (if (or (member (person-name person1) ancestors2) (member (person-name person2) ancestors1)) (setf direct t))
+      (when (not direct)
+        (loop for i in ancestors1 doing (if (member i ancestors2 :test #'equal) (setf cousin t))))))
+  (if cousin t nil)))
 
-(DEFUN isCousinX (p1 x p2 tree)
+
+;; this needs degree
+(defun getcousins(person1 tree)
+  (sort (remove nil (loop for i being the hash-values of tree
+        collecting (if (iscousin person1 i tree) (person-name i)))) #'string<))(DEFUN isCousinX (p1 x p2 tree)
   (LET ()
 
 ))
@@ -356,7 +365,7 @@ exists as a person in the TREE!"
 (DEFUN handle-W (linelist tree)
   "LINELIST is a LIST of strings. TREE is a hash-table."
     ;;body of function goes here
-    (FORMAT t "W ~{~a~} ~% " linelist)
+    (FORMAT t "W ~{~a ~} ~% " linelist)
 (IF(= 2 (LENGTH linelist))
      (LET* ((a (SECOND linelist)))
            ;(FORMAT t "W ~a ~a " (FIRST linelist)(SECOND linelist)))
@@ -365,16 +374,16 @@ exists as a person in the TREE!"
          
          (COND 
            ((EQUAL "ancestor"(FIRST linelist)) (loop for i in (ancestors a tree) doing (FORMAT t "~A~%" i)))
-           ((EQUAL "sibling"(FIRST linelist))(getSibs a tree))
+           ((EQUAL "sibling"(FIRST linelist)) (loop for i in (getSibs a tree) doing (FORMAT t "~A~%" i)))
            ((EQUAL "child"(FIRST linelist))(loop for i in (getChildren a tree) doing (format t "~a~%" i)))
-           ((EQUAL "unrelated"(FIRST linelist))(getUnrelated a tree)))))
+           ((EQUAL "unrelated"(FIRST linelist)) (loop for i in (getUnrelated a tree) doing (format t "~a~%" i)))))
 
     ;;else
     (LET* ((a (THIRD linelist)))
            ;(FORMAT t "W ~a cousin ~a ~a " (FIRST linelist)(THIRD linelist)(FOURTH linelist)))
       (IF (not (person-exists a tree))
           (FORMAT t "~A doesn't exist in the family" a)
-        (getCousinX a (SECOND linelist) tree)))))
+        (getCousinX a (SECOND linelist) tree))))))
  
 
 ;;;------------------------------------------------
