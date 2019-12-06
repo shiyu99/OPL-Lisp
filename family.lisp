@@ -203,14 +203,18 @@ exists as a person in the TREE!"
                (ancestorsb parent2 tree)))))
 
 ;get the generation level difference between an ancestor(a) and a descendent(d)
-(DEFUN getGenGap (na nd tree)
-  (setf genGap 1)
-  (LET* ((pd (lookup-person n2 tree))
-         (pa (lookup-person n1 tree))
-         (parent1 (person-parent1 p))
-         (parent2 (person-parent2 p)))
-    (WHEN (not (or (equal pa parent1) (equal pa parent2)))
-      (+ genGap 1))))
+(DEFUN getGenGap (na nd genGap tree)
+  ;(setf genGap 0)
+  (LET* ((pd (lookup-person nd tree))
+         (pa (lookup-person na tree))
+         (parent1 (person-parent1 pd))
+         (parent2 (person-parent2 pd)))
+    (WHEN parent1
+      (IF (or (equal pa parent1) (equal pa parent2))
+          (+ genGap 1))
+      (getGenGap na parent1 (+ 1 genGap) tree)
+      (getGenGap na parent2 (+ 1 genGap) tree)))
+  genGap)
         
     
 
@@ -228,9 +232,7 @@ exists as a person in the TREE!"
                     (push x siblings)))
        (loop for x in childrenParent2
              do (if(and (not (member x siblings)) (not(equal x n1)))
-                    (push x siblings)))
-
-    )
+                    (push x siblings))))
   (sort siblings #'string<=)
 )
 
@@ -325,8 +327,6 @@ exists as a person in the TREE!"
          (add-person c pc tree)
        (let* ((pc (lookup-person c tree)))
          (setf (person-parent1 a) (person-parent2 b)))))))
-  
-  ;;body of function goes here
   
   
 
@@ -426,7 +426,7 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (ancestors "Annie" tree)
+    (getGenGap "Alex" "Alice" 0 tree)
 ))
 
 
@@ -457,5 +457,6 @@ each line from the file opened in STREAM."
     ;; in some arbitrary order when you call test-tree in the Listener:
     ;;   ("Karen" "Bill" "Fred" "Mary" "Zebulon" "Zenobia")
     (ancestors "Alex" tree)
+    (getGenGap "Zebulon" "Alex" 0 tree)
     (getChildren "Zebulon" tree)
    ))
