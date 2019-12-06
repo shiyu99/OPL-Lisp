@@ -1,5 +1,5 @@
 ;;;; -*- Mode: Lisp; -*- 
-;;;; Team Members: <PUT YOUR NAMES HERE>
+;;;; Team Members: Jack Crawford
 ;;;;
 ;;;;
 ;;;; Submission Deadline: Sunday, December 8, 11:59:59pm
@@ -209,10 +209,8 @@ exists as a person in the TREE!"
          (parent1 (person-parent1 pd))
          (parent2 (person-parent2 pd)))
     (WHEN parent1
-      (IF (or (equal pa parent1) (equal pa parent2))
-          (+ genGap 1)
-      ((+ genGap (getGenGap na parent1 (+ genGap 1) tree))
-      (+ genGap  (getGenGap na parent2 (+ genGap 1) tree)))))
+      (IF (or (equal pa parent1)(equal pa parent2))
+          (+ genGap 1)))
   genGap)
         
 (DEFUN getCommAnc (n1 n2 tree)
