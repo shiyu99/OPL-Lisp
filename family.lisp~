@@ -232,9 +232,7 @@ exists as a person in the TREE!"
                     (push x siblings)))
        (loop for x in childrenParent2
              do (if(and (not (member x siblings)) (not(equal x n1)))
-                    (push x siblings)))
-
-    )
+                    (push x siblings))))
   (sort siblings #'string<=)
 )
 
@@ -428,7 +426,7 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    ;(getGenGap "Laura" "Mary" 0 tree)
+    (getGenGap "Alex" "Alice" 0 tree)
 ))
 
 

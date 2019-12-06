@@ -212,8 +212,8 @@ exists as a person in the TREE!"
     (WHEN parent1
       (IF (or (equal pa parent1) (equal pa parent2))
           (+ genGap 1))
-      (getGenGap na parent1 (+ 1 genGap) tree)
-      (getGenGap na parent2 (+ 1 genGap) tree)))
+      (getGenGap na parent1 (+ genGap 1) tree)
+      (getGenGap na parent2 (+ genGap 1) tree)))
   genGap)
         
     
