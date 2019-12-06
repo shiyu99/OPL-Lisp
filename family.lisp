@@ -215,7 +215,12 @@ exists as a person in the TREE!"
       (+ genGap  (getGenGap na parent2 (+ genGap 1) tree)))))
   genGap)
         
-    
+(DEFUN getCommAnc (n1 n2 tree)
+  (setq commAnc (list))
+  (LET* ((anc1 (ancesters n1 tree))
+        (anc2 (ancesters n2 tree)))
+    (loop for x in anc1
+          do (if (member (x anc1)) (push x commonAnc)))))
 
 
 (DEFUN getSibs(n1 tree)
