@@ -205,20 +205,29 @@ exists as a person in the TREE!"
 ;get the generation level difference between an ancestor(a) and a descendent(d)
 (DEFUN getGenGap (na nd genGap tree)
   (LET* ((pd (lookup-person nd tree))
-         (pa (lookup-person na tree))
+         ;(pa (lookup-person na tree))
          (parent1 (person-parent1 pd))
-         (parent2 (person-parent2 pd)))
+         (parent2 (person-parent2 pd))
+         )
+    ;(print parent1)
+    ;(print parent2)
     (WHEN parent1
-      (IF (or (equal pa parent1)(equal pa parent2))
-          (+ genGap 1)))
+      (IF (or (equal na parent1)(equal nd parent2))
+          (setf genGap (+ genGap 1))
+        (PROGN 
+          (+ genGap (getGenGap na parent1 (+ genGap 1) tree))
+          (+ genGap (getGenGap na parent2 (+ genGap 1) tree))))))
+  ;(setf genGap (+ genGap 1))
   genGap)
+  ;(values na nd ))
         
 (DEFUN getCommAnc (n1 n2 tree)
   (setq commAnc (list))
-  (LET* ((anc1 (ancesters n1 tree))
-        (anc2 (ancesters n2 tree)))
+  (LET* ((anc1 (ancestors n1 tree))
+        (anc2 (ancestors n2 tree)))
     (loop for x in anc1
-          do (if (member (x anc1)) (push x commonAnc)))))
+          do (if (member x anc2) (push x commAnc))))
+  commAnc)
 
 
 (DEFUN getSibs(n1 tree)
@@ -428,7 +437,8 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (getGenGap "Alex" "Andrew" 0 tree)
+    ;(getGenGap "Alex" "Alice" 0 tree)
+    (getCommAnc "Armond" "Alice" tree)
 ))
 
 
