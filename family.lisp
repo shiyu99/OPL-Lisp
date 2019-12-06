@@ -210,9 +210,10 @@ exists as a person in the TREE!"
          (parent2 (person-parent2 pd)))
     (WHEN parent1
       (IF (or (equal pa parent1) (equal pa parent2))
-          (+ genGap 1))
-      (+ genGap (getGenGap na parent1 (+ genGap 1) tree))
-     (+ genGap  (getGenGap na parent2 (+ genGap 1) tree))))
+          (+ genGap 1)
+        (PROGN 
+          (+ genGap (getGenGap na parent1 (+ genGap 1) tree))
+          (+ genGap (getGenGap na parent2 (+ genGap 1) tree))))))
   genGap)
         
 (DEFUN getCommAnc (n1 n2 tree)
@@ -430,7 +431,7 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (getGenGap "Alex" "Alice" 0 tree)
+    (getGenGap "Alex" "Andrew" 0 tree)
 ))
 
 
