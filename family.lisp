@@ -231,11 +231,6 @@ exists as a person in the TREE!"
   (LET ()
 
 ))
-
-(DEFUN getCousinX(p1 x tree)
-  (LET ()
-
-))
     
 
 (DEFUN isChild (n1 n2 tree)
@@ -249,8 +244,23 @@ exists as a person in the TREE!"
 (DEFUN isAncestor (n1 n2 tree)
   (member n1 (ancestors n2 tree):test #'EQUAL)
 )
+;; this needs degree
+(defun iscousin(person1 person2 tree)
+  (let ((direct nil) (cousin nil))
+  (when (and person1 person2)
+      (if (string= (person-name person1) (person-name person2)) (setf direct t))
+      (if (or (isChild person1 person2) (isChild person2 person1)) (setf direct t))
+      (let ((ancestors1 (getancestors person1 tree)) (ancestors2 (getancestors person2 tree)))
+      (if (or (member (person-name person1) ancestors2) (member (person-name person2) ancestors1)) (setf direct t))
+      (when (not direct)
+        (loop for i in ancestors1 doing (if (member i ancestors2 :test #'equal) (setf cousin t))))))
+  (if cousin t nil)))
 
-(DEFUN isCousinX (p1 x p2 tree)
+
+;; this needs degree
+(defun getcousins(person1 tree)
+  (sort (remove nil (loop for i being the hash-values of tree
+        collecting (if (iscousin person1 i tree) (person-name i)))) #'string<))(DEFUN isCousinX (p1 x p2 tree)
   (LET ()
 
 ))
