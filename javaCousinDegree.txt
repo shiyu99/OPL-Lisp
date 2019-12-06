@@ -1,0 +1,25 @@
+	public static int cousinDegree(person x, person y) {
+		ArrayList<person> xAncestors = new ArrayList<person>();
+		ArrayList<person> yAncestors = new ArrayList<person>();
+		
+		int inc = 0, heightx = 0, heighty = 0, sepDegree = -1;
+		boolean stop = false;
+		
+		while(!stop && inc < xAncestors.size()) {
+			for(int i = 0; i<yAncestors.size(); i++) {
+				if(xAncestors.get(inc).equals(yAncestors.get(i))) {
+					stop = true;
+					heightx = inc;
+					heighty = i;
+				}
+			}
+			inc++;
+		}
+		if(heightx == heighty)
+			sepDegree = heightx/2;
+		if(heightx>heighty)
+			sepDegree = heighty/2;
+		else
+			sepDegree = heightx/2;
+		return sepDegree;
+	}
