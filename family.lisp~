@@ -1,5 +1,5 @@
 ;;;; -*- Mode: Lisp; -*- 
-;;;; Team Members: <PUT YOUR NAMES HERE>
+;;;; Team Members: Jack Crawford
 ;;;;
 ;;;;
 ;;;; Submission Deadline: Sunday, December 8, 11:59:59pm
@@ -204,19 +204,30 @@ exists as a person in the TREE!"
 
 ;get the generation level difference between an ancestor(a) and a descendent(d)
 (DEFUN getGenGap (na nd genGap tree)
-  ;(setf genGap 0)
   (LET* ((pd (lookup-person nd tree))
-         (pa (lookup-person na tree))
+         ;(pa (lookup-person na tree))
          (parent1 (person-parent1 pd))
-         (parent2 (person-parent2 pd)))
+         (parent2 (person-parent2 pd))
+         )
+    ;(print parent1)
+    ;(print parent2)
     (WHEN parent1
-      (IF (or (equal pa parent1) (equal pa parent2))
-          (+ genGap 1))
-      (getGenGap na parent1 (+ 1 genGap) tree)
-      (getGenGap na parent2 (+ 1 genGap) tree)))
+      (IF (or (equal na parent1)(equal nd parent2))
+          (setf genGap (+ genGap 1))
+        (PROGN 
+          (+ genGap (getGenGap na parent1 (+ genGap 1) tree))
+          (+ genGap (getGenGap na parent2 (+ genGap 1) tree))))))
+  ;(setf genGap (+ genGap 1))
   genGap)
+  ;(values na nd ))
         
-    
+(DEFUN getCommAnc (n1 n2 tree)
+  (setq commAnc (list))
+  (LET* ((anc1 (ancestors n1 tree))
+        (anc2 (ancestors n2 tree)))
+    (loop for x in anc1
+          do (if (member x anc2) (push x commAnc))))
+  commAnc)
 
 
 (DEFUN getSibs(n1 tree)
@@ -238,17 +249,28 @@ exists as a person in the TREE!"
 
 
 
-(DEFUN getUnrelated(p1 tree)
-  (LET ()
+(DEFUN isUnrelated(n1 n2 tree)
+  (LET* ((unrelatedbool t))
+    (when (and n1 n2)
+      ;(if (getChildren n1 n2 tree)(getChildren n2 n1 tree )
+          (setf unrelatedbool nil))
+      ;(if (getSibs n1 tree)(setf unrelatedbool nil))
+      (if (getCousins n1 tree)(setf unrelatedbool nil))                                                   
+      (if (or(ancestorb n1 n2 tree) (isAncestor n2 n1 tree))
+              (setf unrelatedbool nil))
+      (if unrelatedbool t nil)))
 
-))
+(DEFUN getUnrelated(n1 tree)
+  
+  (member n1 (getUnrelated n2 tree):test #'EQUAL)
+)
     
 
 (DEFUN isChild (n1 n2 tree)
   (member n1 (getChildren n2 tree):test #'EQUAL)
 )
 
-(DEFUN isSib(p1 p2 tree)
+(DEFUN isSib(n1 n2 tree)
   (member n1 (getSibs n2 tree):test #'EQUAL)
 )
 
@@ -276,15 +298,12 @@ exists as a person in the TREE!"
                           collecting (if (isCousin n1 i tree) i)))#'string<))
 
 
-(DEFUN isCousinX (p1 x p2 tree)
+(DEFUN isCousinX (n1 x n2 tree)
   (LET ()
 
 ))
 
-(DEFUN isUnrelated(p1 p2 tree)
-  (LET ()
 
-))
 
 
 
@@ -426,7 +445,8 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (getGenGap "Alex" "Alice" 0 tree)
+    ;(getGenGap "Alex" "Alice" 0 tree)
+    (getCommAnc "Armond" "Alice" tree)
 ))
 
 
