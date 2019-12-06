@@ -243,9 +243,8 @@ exists as a person in the TREE!"
 )
 
 (DEFUN isSib(p1 p2 tree)
-  (LET ()
-
-))
+  (member n1 (getSibs n2 tree):test #'EQUAL)
+)
 
 (DEFUN isAncestor (n1 n2 tree)
   (member n1 (ancestors n2 tree):test #'EQUAL)
