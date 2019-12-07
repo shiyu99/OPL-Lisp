@@ -1,5 +1,5 @@
 ;;;; -*- Mode: Lisp; -*- 
-;;;; Team Members: Jack Crawford
+;;;; Team Members: Shiyu (Jenny) Su, Jack Crawford, Sarah 
 ;;;;
 ;;;;
 ;;;; Submission Deadline: Sunday, December 8, 11:59:59pm
@@ -206,17 +206,20 @@ exists as a person in the TREE!"
 (DEFUN getGenGap (na nd genGap tree)
   (LET* ((pd (lookup-person nd tree)))
          ;(pa (lookup-person na tree))
-         (when pd
-             (LET ((parent1 (person-parent1 pd))
-                   (parent2 (person-parent2 pd)))
-         
-               (WHEN parent1
-                 (IF (or (equal na parent1)(equal nd parent2))
-                     (setf genGap (+ gengap 1))
+    ;(When (not pd)
+      ;(setf genGap 10000))
+    (when pd
+      (LET ((parent1 (person-parent1 pd))
+            (parent2 (person-parent2 pd)))
+        (WHEN (not parent1)
+          (setf genGap 10000))
+        (WHEN parent1
+          (IF (or (equal na parent1)(equal nd parent2))
+              (setf genGap (+ gengap 1))
        
-                   (setf genGap (min (getGenGap na parent1 (+ genGap 1) tree) (getGenGap na parent2 (+ genGap 1) tree)))
+            (setf genGap (min (getGenGap na parent1 (+ genGap 1) tree) (getGenGap na parent2 (+ genGap 1) tree)))
           ;(+ genGap (getGenGap na parent2 (+ genGap 1) tree)))
-)))))
+            )))))
   ;(setf genGap (+ genGap 1))
   genGap)
 
@@ -445,7 +448,7 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (getGenGap "Mary" "Van" 0 tree)
+    (getGenGap "Alex" "Eamon" 0 tree)
     ;(getCommAnc "Armond" "Alice" tree)
 ))
 
