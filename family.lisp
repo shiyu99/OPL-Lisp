@@ -232,7 +232,7 @@ exists as a person in the TREE!"
     ;(loop for x in anc2 do (format t "~a~%" x))
     (loop for x in anc2
           do (if (member x anc1 :test #'EQUAL) (push x commAnc))))
-  (format t "~a~%" commAnc)
+  ;(format t "~a~%" commAnc)
   commAnc)
 
 
@@ -268,8 +268,8 @@ exists as a person in the TREE!"
 
 (DEFUN getUnrelated(n1 tree)
   
-  ;(member n1 (getUnrelated n2 tree):test #'EQUAL)
-)
+  (sort (remove nil (loop for i being the hash-keys of tree
+                          collecting (if (isUnrelated n1 i tree) i)))#'string<))
     
 
 (DEFUN isChild (n1 n2 tree)
@@ -304,17 +304,17 @@ exists as a person in the TREE!"
                           collecting (if (isCousin n1 i tree) i)))#'string<))
 
 (DEFUN getCousinX (n1 x tree)
-  (LET 
-
-
+  (sort (remove nil (loop for i being the hash-keys of tree
+                          collecting (if (isCousinX n1 x i tree) i)))#'string<))
+  
 (DEFUN isCousinX (n1 x n2 tree)
   (let* ((cousinX nil)
          (genGaps nil)
          (mini 10000))
     (WHEN (isCousin n1 n2 tree)
       (let ((commAncs (getCommAnc n1 n2 tree)))
-        (format t "~a~%" commAncs)
-        (loop for i in CommAncs doing (push (getGenGap i n1 0 tree) genGaps) (push (getGenGap i n2 0 tree) genGaps)(format t "~a~%" genGaps))
+        ;(format t "~a~%" commAncs)
+        (loop for i in CommAncs doing (push (getGenGap i n1 0 tree) genGaps) (push (getGenGap i n2 0 tree) genGaps))
         (loop for i in genGaps doing (setf mini (min mini i)))
         (IF (equal (parse-integer x) (- mini 1)) (setf cousinX t))))
     (IF cousinX t nil)))
@@ -358,7 +358,8 @@ exists as a person in the TREE!"
      (IF (not (person-exists c tree))
          (add-person c pc tree)
        (let* ((pc (lookup-person c tree)))
-         (setf (person-parent1 a) (person-parent2 b)))))))
+         (setf (person-parent1 pc) a)
+         (setf (person-parent2 pc) b))))))
   
   
 
@@ -425,15 +426,15 @@ exists as a person in the TREE!"
            ((EQUAL "ancestor"(FIRST linelist)) (loop for i in (ancestors a tree) doing (FORMAT t "~A~%" i)))
            ((EQUAL "sibling"(FIRST linelist)) (loop for i in (getSibs a tree) doing (FORMAT t "~A~%" i)))
            ((EQUAL "child"(FIRST linelist))(loop for i in (getChildren a tree) doing (format t "~a~%" i)))
-           ((EQUAL "cousin"(FIRST linelist))(loop for i in (getCousins a tree) doing (format t "~a~%" i)))
+           ;((EQUAL "cousin"(FIRST linelist))(loop for i in (getCousins a tree) doing (format t "~a~%" i)))
            ((EQUAL "unrelated"(FIRST linelist)) (loop for i in (getUnrelated a tree) doing (format t "~a~%" i))))))
 
     ;;else
     (LET* ((a (THIRD linelist)))
-           ;(FORMAT t "W ~a cousin ~a ~a " (FIRST linelist)(THIRD linelist)(FOURTH linelist)))
+     ; (FORMAT t "W cousin ~a ~a " (Second linelist)(THIRD linelist))
       (IF (not (person-exists a tree))
           (FORMAT t "~A doesn't exist~%" a)
-        (getCousinX a (SECOND linelist) tree)))))
+        (loop for i in (getCousinX a (SECOND linelist) tree) doing (format t "~a~%" i))))))
  
 
 ;;;------------------------------------------------
@@ -458,7 +459,7 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (getGenGap "David" "Daniel" 0 tree)
+    ;(getGenGap "David" "Daniel" 0 tree)
     ;(getCommAnc "Armond" "Alice" tree)
 ))
 
