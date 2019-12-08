@@ -214,9 +214,8 @@ exists as a person in the TREE!"
         (WHEN (not parent1)
           (setf genGap 10000))
         (WHEN parent1
-          (IF (or (equal na parent1)(equal nd parent2))
-              (setf genGap (+ gengap 1))
-       
+          (IF (or (equal na parent1)(equal na parent2))
+              (setf genGap (+ gengap 1))       
             (setf genGap (min (getGenGap na parent1 (+ genGap 1) tree) (getGenGap na parent2 (+ genGap 1) tree)))
           ;(+ genGap (getGenGap na parent2 (+ genGap 1) tree)))
             )))))
@@ -228,8 +227,12 @@ exists as a person in the TREE!"
   (setq commAnc (list))
   (LET* ((anc1 (ancestors n1 tree))
         (anc2 (ancestors n2 tree)))
-    (loop for x in anc1
-          do (if (member x anc2) (push x commAnc))))
+    ;(format t "~a~%" anc1)
+    ;(format t "~a~%" anc2)
+    ;(loop for x in anc2 do (format t "~a~%" x))
+    (loop for x in anc2
+          do (if (member x anc1 :test #'EQUAL) (push x commAnc))))
+  (format t "~a~%" commAnc)
   commAnc)
 
 
@@ -242,12 +245,12 @@ exists as a person in the TREE!"
          (childrenParent2 (getChildren parent2 tree))
          )
        (loop for x in childrenParent1
-             do (if(and (not (member x siblings)) (not(equal x n1)))
+             do (if(and (not (member x siblings :test #'EQUAL)) (not(equal x n1)))
                     (push x siblings)))
        (loop for x in childrenParent2
-             do (if(and (not (member x siblings)) (not(equal x n1)))
+             do (if(and (not (member x siblings :test #'EQUAL)) (not(equal x n1)))
                     (push x siblings))))
-  (sort siblings #'string<=)
+  (remove-duplicates(sort siblings #'string<=) ::test #'equal)
 )
 
 
@@ -300,14 +303,21 @@ exists as a person in the TREE!"
   (sort (remove nil (loop for i being the hash-keys of tree
                           collecting (if (isCousin n1 i tree) i)))#'string<))
 
+(DEFUN getCousinX (n1 x tree)
+  (LET 
+
 
 (DEFUN isCousinX (n1 x n2 tree)
-  (LET ()
-
-))
-
-
-
+  (let* ((cousinX nil)
+         (genGaps nil)
+         (mini 10000))
+    (WHEN (isCousin n1 n2 tree)
+      (let ((commAncs (getCommAnc n1 n2 tree)))
+        (format t "~a~%" commAncs)
+        (loop for i in CommAncs doing (push (getGenGap i n1 0 tree) genGaps) (push (getGenGap i n2 0 tree) genGaps)(format t "~a~%" genGaps))
+        (loop for i in genGaps doing (setf mini (min mini i)))
+        (IF (equal (parse-integer x) (- mini 1)) (setf cousinX t))))
+    (IF cousinX t nil)))
 
 
 
@@ -448,7 +458,7 @@ each line from the file opened in STREAM."
        ((EQUAL "X" (FIRST line-items)) (handle-X (REST line-items) tree))
        (t (RETURN nil))) ; end of file reached
      (SETF line-items (SPLIT-SEQUENCE " " (READ-LINE stream nil "") :test #'equal)))
-    (getGenGap "Alex" "Eamon" 0 tree)
+    (getGenGap "David" "Daniel" 0 tree)
     ;(getCommAnc "Armond" "Alice" tree)
 ))
 
