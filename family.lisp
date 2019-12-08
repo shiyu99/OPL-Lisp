@@ -224,23 +224,25 @@ exists as a person in the TREE!"
 
         
 (DEFUN getCommAnc (n1 n2 tree)
-  (setq commAnc (list))
+  
   (LET* ((anc1 (ancestors n1 tree))
-        (anc2 (ancestors n2 tree)))
+        (anc2 (ancestors n2 tree))
+        (commAnc (list)))
     ;(format t "~a~%" anc1)
     ;(format t "~a~%" anc2)
     ;(loop for x in anc2 do (format t "~a~%" x))
     (loop for x in anc2
-          do (if (member x anc1 :test #'EQUAL) (push x commAnc))))
-  ;(format t "~a~%" commAnc)
-  commAnc)
+          do (if (member x anc1 :test #'EQUAL) (push x commAnc)))
+  ;(format t "~a~%" commAnc
+ commAnc))
 
 
 (DEFUN getSibs(n1 tree)
-  (setq siblings (list))
+  
   (LET* ((p (lookup-person n1 tree))
          (parent1 (person-parent1 p))
          (parent2 (person-parent2 p))
+         (siblings (list))
          (childrenParent1 (getChildren parent1 tree))
          (childrenParent2 (getChildren parent2 tree))
          )
@@ -249,8 +251,8 @@ exists as a person in the TREE!"
                     (push x siblings)))
        (loop for x in childrenParent2
              do (if(and (not (member x siblings :test #'EQUAL)) (not(equal x n1)))
-                    (push x siblings))))
-  (remove-duplicates(sort siblings #'string<=) ::test #'equal)
+                    (push x siblings)))
+  (remove-duplicates(sort siblings #'string<=) ::test #'equal))
 )
 
 
@@ -378,8 +380,8 @@ exists as a person in the TREE!"
                  ((not (person-exists b tree))
                   (FORMAT t "~A doesn't exist in the family~%" b))
                  ((and (person-exists a tree) (person-exists b tree))
-                  (let* ((pa (lookup-person a tree))
-                         (pb (lookup-person b tree)))              
+                  ;(let* ((pa (lookup-person a tree))
+                         ;(pb (lookup-person b tree)))              
                     (COND 
                      ((EQUAL "ancestor"(SECOND linelist))
                       (IF (isAncestor a b tree) (FORMAT t "YES~%")
@@ -395,7 +397,7 @@ exists as a person in the TREE!"
                         (FORMAT t "NO~%")))
                      ((EQUAL "unrelated"(SECOND linelist))
                       (IF (isUnrelated a b tree) (FORMAT t "YES~%") 
-                        (FORMAT t "NO~%"))))))))
+                        (FORMAT t "NO~%")))))))
 
     ;;else
   
